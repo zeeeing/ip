@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Buddy {
@@ -20,18 +21,38 @@ public class Buddy {
         System.out.println("_________________________________________________________");
 
         Scanner scanner = new Scanner(System.in);
+        ArrayList<String> tasks = new ArrayList<>();
+
         while (scanner.hasNextLine()) {
             String input = scanner.nextLine();
+
+            // exit program
             if (input.trim().equalsIgnoreCase("bye")) {
-                System.out.println("_________________________________________________________");
-                System.out.println("Bye. Hope to see you again soon!");
-                System.out.println("_________________________________________________________");
+                System.out.println("  _______________________________________________________");
+                System.out.println("  Bye. Hope to see you again soon!");
+                System.out.println("  _______________________________________________________");
                 break;
             }
 
-            System.out.println("_________________________________________________________");
-            System.out.println("  " + input);
-            System.out.println("_________________________________________________________");
+            // list tasks
+            else if (input.trim().equalsIgnoreCase("list")) {
+                System.out.println("  _______________________________________________________");
+                System.out.println("  Here are the tasks in your list:");
+                int x = 1;
+                for (String task : tasks) {
+                    System.out.println("  " + x + ". " + task);
+                    x++;
+                }
+                System.out.println("  _______________________________________________________");
+            }
+
+            // add task to list
+            else {
+                tasks.add(input);
+                System.out.println("  _______________________________________________________");
+                System.out.println("  added: " + input);
+                System.out.println("  _______________________________________________________");
+            }
         }
 
         scanner.close();
