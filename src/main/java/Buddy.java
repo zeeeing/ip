@@ -12,13 +12,101 @@ public class Buddy {
                 |______/    \\____/   |_____/   |_____/     |_|
             """;
 
-    public static void main(String[] args) {
-        System.out.println("_________________________________________________________");
+    public static void printDivider() {
+        System.out.println("    ____________________________________________________________");
+    }
+
+    public static void welcomeMessage() {
+        printDivider();
         System.out.println("\n    Hello from\n" + BUDDY_LOGO);
-        System.out.println("_________________________________________________________");
-        System.out.println("Hello! I'm " + CHATBOT_NAME);
-        System.out.println("What can I do for you?");
-        System.out.println("_________________________________________________________");
+        printDivider();
+        System.out.println("     Hello! I'm " + CHATBOT_NAME);
+        System.out.println("     What can I do for you?");
+        printDivider();
+    }
+
+    public static void exitProgram() {
+        printDivider();
+        System.out.println("     Bye. Hope to see you again soon!");
+        printDivider();
+    }
+
+    public static void listAllTasks(ArrayList<Task> tasks) {
+        printDivider();
+        System.out.println("     Here are the tasks in your list:");
+        int x = 1;
+        for (Task task : tasks) {
+            System.out.println("     " + x + "." + task);
+            x++;
+        }
+        printDivider();
+    }
+
+    public static void unknownUserInputMessage() {
+        printDivider();
+        System.out.println("     I'm sorry, but I don't know what that means :-(\n");
+        System.out.println("     Please use commands that I can understand:\n");
+        System.out.println("     1. list");
+        System.out.println("     2. mark <task_number>");
+        System.out.println("     3. todo <desc>");
+        System.out.println("     4. deadline <desc> /by <time>");
+        System.out.println("     5. event <desc> /from <time> /to <time>");
+        printDivider();
+    }
+
+    public static void taskAddedSuccessMessage(Task newTask, int taskCounter) {
+        printDivider();
+        System.out.println("     Got it. I've added this task:");
+        System.out.println("       " + newTask);
+        System.out.println("     Now you have " + taskCounter + " tasks in the list.");
+        printDivider();
+    }
+
+    public static Task addTask(String input) {
+        if (input.trim().toLowerCase().startsWith("todo ")) {
+            String description = input.trim().substring(5).trim();
+            if (description.isEmpty()) {
+                printDivider();
+                System.out.println("     The description of a todo cannot be empty.");
+                printDivider();
+                return null;
+            }
+            return new Todo(description);
+        } else if (input.trim().toLowerCase().startsWith("deadline ")) {
+            String[] parts = input.trim().substring(9).split(" /by ", 2);
+            if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
+                printDivider();
+                System.out.println("     Invalid deadline format. Use: deadline <desc> /by <time>");
+                printDivider();
+                return null;
+            }
+            return new Deadline(parts[0].trim(), parts[1].trim());
+        } else if (input.trim().toLowerCase().startsWith("event ")) {
+            // split the string into 2 parts at /from first
+            String[] parts = input.trim().substring(6).split(" /from ", 2);
+            if (parts.length < 2 || parts[0].trim().isEmpty()) {
+                printDivider();
+                System.out.println("     Invalid event format. Use: event <desc> /from <time> /to <time>");
+                printDivider();
+                return null;
+            }
+            // further split the 2nd part of the initial string into 2 parts at /to
+            String[] timeParts = parts[1].split(" /to ", 2);
+            if (timeParts.length < 2 || timeParts[0].trim().isEmpty() || timeParts[1].trim().isEmpty()) {
+                printDivider();
+                System.out.println("     Invalid event format. Use: event <desc> /from <time> /to <time>");
+                printDivider();
+                return null;
+            }
+            return new Event(parts[0].trim(), timeParts[0].trim(), timeParts[1].trim());
+        } else {
+            unknownUserInputMessage();
+            return null;
+        }
+    }
+
+    public static void main(String[] args) {
+        welcomeMessage();
 
         Scanner scanner = new Scanner(System.in);
         ArrayList<Task> tasks = new ArrayList<>();
@@ -28,22 +116,13 @@ public class Buddy {
 
             // exit program
             if (input.trim().equalsIgnoreCase("bye")) {
-                System.out.println("  _______________________________________________________");
-                System.out.println("  Bye. Hope to see you again soon!");
-                System.out.println("  _______________________________________________________");
+                exitProgram();
                 break;
             }
 
             // list tasks
             else if (input.trim().equalsIgnoreCase("list")) {
-                System.out.println("  _______________________________________________________");
-                System.out.println("  Here are the tasks in your list:");
-                int x = 1;
-                for (Task task : tasks) {
-                    System.out.println("  " + x + ". " + task);
-                    x++;
-                }
-                System.out.println("  _______________________________________________________");
+                listAllTasks(tasks);
             }
 
             // mark task as completed
@@ -53,9 +132,9 @@ public class Buddy {
 
                 // check if a number is provided
                 if (parts.length < 2) {
-                    System.out.println("  _______________________________________________________");
-                    System.out.println("  Please provide a task number to mark.");
-                    System.out.println("  _______________________________________________________");
+                    printDivider();
+                    System.out.println("     Please provide a task number to mark.");
+                    printDivider();
                     continue;
                 }
 
@@ -64,23 +143,24 @@ public class Buddy {
 
                     // check if index is valid
                     if (idx <= 0 || idx > tasks.size()) {
-                        System.out.println("  _______________________________________________________");
-                        System.out.println("  Invalid task number: " + idx);
-                        System.out.println("  _______________________________________________________");
+                        printDivider();
+                        System.out.println("     Invalid task number: " + idx);
+                        System.out.println("     Please pick between 1" + " and " + tasks.size());
+                        printDivider();
                         continue;
                     }
 
                     Task t = tasks.get(idx - 1);
                     t.mark();
 
-                    System.out.println("  _______________________________________________________");
-                    System.out.println("  Nice! I've marked this task as done:");
-                    System.out.println("    " + t);
-                    System.out.println("  _______________________________________________________");
+                    printDivider();
+                    System.out.println("     Nice! I've marked this task as done:");
+                    System.out.println("       " + t);
+                    printDivider();
                 } catch (NumberFormatException e) {
-                    System.out.println("  _______________________________________________________");
-                    System.out.println("  That's not a valid number to mark: '" + parts[1] + "'");
-                    System.out.println("  _______________________________________________________");
+                    printDivider();
+                    System.out.println("     That's not a valid number to mark: '" + parts[1] + "'");
+                    printDivider();
                 }
             }
 
@@ -91,9 +171,9 @@ public class Buddy {
 
                 // check if a number is provided
                 if (parts.length < 2) {
-                    System.out.println("  _______________________________________________________");
-                    System.out.println("  Please provide a task number to unmark.");
-                    System.out.println("  _______________________________________________________");
+                    printDivider();
+                    System.out.println("     Please provide a task number to unmark.");
+                    printDivider();
                     continue;
                 }
 
@@ -102,40 +182,40 @@ public class Buddy {
 
                     // check if index is valid
                     if (idx <= 0 || idx > tasks.size()) {
-                        System.out.println("  _______________________________________________________");
-                        System.out.println("  Invalid task number: " + idx);
-                        System.out.println("  _______________________________________________________");
+                        printDivider();
+                        System.out.println("     Invalid task number: " + idx);
+                        System.out.println("     Please pick between 1" + " and " + tasks.size());
+                        printDivider();
                         continue;
                     }
 
                     Task t = tasks.get(idx - 1);
                     t.unmark();
 
-                    System.out.println("  _______________________________________________________");
-                    System.out.println("  OK, I've marked this task as not done yet:");
-                    System.out.println("    " + t);
-                    System.out.println("  _______________________________________________________");
+                    printDivider();
+                    System.out.println("     OK, I've marked this task as not done yet:");
+                    System.out.println("       " + t);
+                    printDivider();
                 } catch (NumberFormatException e) {
-                    System.out.println("  _______________________________________________________");
-                    System.out.println("  That's not a valid number to unmark: '" + parts[1] + "'");
-                    System.out.println("  _______________________________________________________");
+                    printDivider();
+                    System.out.println("     That's not a valid number to unmark: '" + parts[1] + "'");
+                    printDivider();
                 }
             }
 
-            // add task to list
+            // add task
             else {
-                // trim description
-                String desc = input.trim();
-
-                // instantiate new Task object
-                Task newTask = new Task(desc);
-
-                // add task to list
-                tasks.add(newTask);
-
-                System.out.println("  _______________________________________________________");
-                System.out.println("  added: " + desc);
-                System.out.println("  _______________________________________________________");
+                try {
+                    Task newTask = addTask(input);
+                    if (newTask != null) {
+                        tasks.add(newTask);
+                        taskAddedSuccessMessage(newTask, tasks.size());
+                    }
+                } catch (Exception e) {
+                    printDivider();
+                    System.out.println("     An error occurred: " + e.getMessage());
+                    printDivider();
+                }
             }
         }
 
