@@ -1,0 +1,5 @@
+public class InvalidIndexException extends BuddyException {
+    public InvalidIndexException(String message) {
+        super(message);
+    }
+}
