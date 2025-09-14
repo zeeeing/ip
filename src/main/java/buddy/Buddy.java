@@ -1,5 +1,17 @@
+package buddy;
+
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import buddy.exceptions.BuddyException;
+import buddy.exceptions.InvalidCommandException;
+import buddy.exceptions.InvalidFormatException;
+import buddy.exceptions.InvalidIndexException;
+import buddy.exceptions.MissingArgumentException;
+import buddy.tasks.Deadline;
+import buddy.tasks.Event;
+import buddy.tasks.Task;
+import buddy.tasks.Todo;
 
 public class Buddy {
     private static final String CHATBOT_NAME = "Buddy";
