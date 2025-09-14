@@ -1,3 +1,4 @@
+package buddy.exceptions;
 public class InvalidCommandException extends BuddyException {
     public InvalidCommandException() {
         super("");
