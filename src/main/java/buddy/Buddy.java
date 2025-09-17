@@ -1,17 +1,18 @@
 package buddy;
 
-import java.util.ArrayList;
-import java.util.Scanner;
-
 import buddy.exceptions.BuddyException;
 import buddy.exceptions.InvalidCommandException;
 import buddy.exceptions.InvalidFormatException;
 import buddy.exceptions.InvalidIndexException;
 import buddy.exceptions.MissingArgumentException;
+import buddy.storage.Storage;
 import buddy.tasks.Deadline;
 import buddy.tasks.Event;
 import buddy.tasks.Task;
 import buddy.tasks.Todo;
+
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Buddy {
     private static final String CHATBOT_NAME = "Buddy";
@@ -127,7 +128,6 @@ public class Buddy {
                 throw new InvalidFormatException("Invalid event format. Use: event <desc> /from <time> /to <time>");
             }
             return new Event(firstSplit[0].trim(), timeParts[0].trim(), timeParts[1].trim());
-
         default:
             throw new InvalidCommandException();
         }
@@ -156,10 +156,12 @@ public class Buddy {
     }
 
     public static void main(String[] args) {
+        Storage storage = new Storage();
+        ArrayList<Task> tasks = new ArrayList<>(storage.load());
+
         welcomeMessage();
 
         Scanner scanner = new Scanner(System.in);
-        ArrayList<Task> tasks = new ArrayList<>();
 
         while (scanner.hasNextLine()) {
             String input = scanner.nextLine();
@@ -202,6 +204,8 @@ public class Buddy {
                     System.out.println("     Nice! I've marked this task as done:");
                     System.out.println("       " + t);
                     printDivider();
+
+                    storage.save(tasks);
                 }
 
                 // unmark task
@@ -230,19 +234,26 @@ public class Buddy {
                     System.out.println("     OK, I've marked this task as not done yet:");
                     System.out.println("       " + t);
                     printDivider();
+
+                    storage.save(tasks);
                 }
 
                 // delete task
                 else if (input.trim().equalsIgnoreCase("delete") || input.trim().toLowerCase().startsWith("delete ")) {
                     Task removedTask = deleteTask(input, tasks);
                     printTaskDeletedSuccessMessage(removedTask, tasks.size());
+                    
+                    storage.save(tasks);
                 }
 
                 // add a task
                 else {
                     Task newTask = addTask(input);
                     tasks.add(newTask);
+
                     printTaskAddedSuccessMessage(newTask, tasks.size());
+                  
+                    storage.save(tasks);
                 }
             } catch (InvalidCommandException e) {
                 printHelp();
