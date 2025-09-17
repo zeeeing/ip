@@ -49,16 +49,16 @@ public class Buddy {
             System.out.println("     You currently do not have any recorded tasks.");
         } else {
             System.out.println("     Here are the tasks in your list:");
-            int x = 1;
+            int taskIndex = 1;
             for (Task task : tasks) {
-                System.out.println("     " + x + "." + task);
-                x++;
+                System.out.println("     " + taskIndex + "." + task);
+                taskIndex++;
             }
         }
         printDivider();
     }
 
-    public static void unknownUserInputMessage() {
+    public static void printHelp() {
         printDivider();
         System.out.println("     I'm sorry, but I don't know what that means :-(\n");
         System.out.println("     Please use commands that I can understand:\n");
@@ -208,7 +208,7 @@ public class Buddy {
                     taskAddedSuccessMessage(newTask, tasks.size());
                 }
             } catch (InvalidCommandException e) {
-                unknownUserInputMessage();
+                printHelp();
             } catch (BuddyException e) {
                 printDivider();
                 System.out.println("     " + e.getMessage());
