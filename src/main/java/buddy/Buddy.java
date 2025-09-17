@@ -67,14 +67,23 @@ public class Buddy {
         System.out.println("     3. todo <desc>");
         System.out.println("     4. deadline <desc> /by <time>");
         System.out.println("     5. event <desc> /from <time> /to <time>");
+        System.out.println("     6. delete <task_number>");
         printDivider();
     }
 
-    public static void taskAddedSuccessMessage(Task newTask, int taskCounter) {
+    public static void printTaskAddedSuccessMessage(Task newTask, int taskCount) {
         printDivider();
         System.out.println("     Got it. I've added this task:");
         System.out.println("       " + newTask);
-        System.out.println("     Now you have " + taskCounter + " tasks in the list.");
+        System.out.println("     Now you have " + taskCount + " tasks in the list.");
+        printDivider();
+    }
+
+    public static void printTaskDeletedSuccessMessage(Task removedTask, int taskCount) {
+        printDivider();
+        System.out.println("     Noted. I've removed this task:");
+        System.out.println("       " + removedTask);
+        System.out.println("     Now you have " + taskCount + " tasks in the list.");
         printDivider();
     }
 
@@ -89,39 +98,61 @@ public class Buddy {
         String rest = tokens.length > 1 ? tokens[1].trim() : "";
 
         switch (command) {
-            case "todo":
-                if (rest.isEmpty()) {
-                    throw new MissingArgumentException("The description of a todo cannot be empty.");
-                }
-                return new Todo(rest);
+        case "todo":
+            if (rest.isEmpty()) {
+                throw new MissingArgumentException("The description of a todo cannot be empty.");
+            }
+            return new Todo(rest);
 
-            case "deadline":
-                if (rest.isEmpty()) {
-                    throw new InvalidFormatException("Invalid deadline format. Use: deadline <desc> /by <time>");
-                }
-                String[] parts = rest.split(" /by ", 2);
-                if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
-                    throw new InvalidFormatException("Invalid deadline format. Use: deadline <desc> /by <time>");
-                }
-                return new Deadline(parts[0].trim(), parts[1].trim());
+        case "deadline":
+            if (rest.isEmpty()) {
+                throw new InvalidFormatException("Invalid deadline format. Use: deadline <desc> /by <time>");
+            }
+            String[] parts = rest.split(" /by ", 2);
+            if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
+                throw new InvalidFormatException("Invalid deadline format. Use: deadline <desc> /by <time>");
+            }
+            return new Deadline(parts[0].trim(), parts[1].trim());
 
-            case "event":
-                if (rest.isEmpty()) {
-                    throw new InvalidFormatException("Invalid event format. Use: event <desc> /from <time> /to <time>");
-                }
-                String[] firstSplit = rest.split(" /from ", 2);
-                if (firstSplit.length < 2 || firstSplit[0].trim().isEmpty()) {
-                    throw new InvalidFormatException("Invalid event format. Use: event <desc> /from <time> /to <time>");
-                }
-                String[] timeParts = firstSplit[1].split(" /to ", 2);
-                if (timeParts.length < 2 || timeParts[0].trim().isEmpty() || timeParts[1].trim().isEmpty()) {
-                    throw new InvalidFormatException("Invalid event format. Use: event <desc> /from <time> /to <time>");
-                }
-                return new Event(firstSplit[0].trim(), timeParts[0].trim(), timeParts[1].trim());
+        case "event":
+            if (rest.isEmpty()) {
+                throw new InvalidFormatException("Invalid event format. Use: event <desc> /from <time> /to <time>");
+            }
+            String[] firstSplit = rest.split(" /from ", 2);
+            if (firstSplit.length < 2 || firstSplit[0].trim().isEmpty()) {
+                throw new InvalidFormatException("Invalid event format. Use: event <desc> /from <time> /to <time>");
+            }
+            String[] timeParts = firstSplit[1].split(" /to ", 2);
+            if (timeParts.length < 2 || timeParts[0].trim().isEmpty() || timeParts[1].trim().isEmpty()) {
+                throw new InvalidFormatException("Invalid event format. Use: event <desc> /from <time> /to <time>");
+            }
+            return new Event(firstSplit[0].trim(), timeParts[0].trim(), timeParts[1].trim());
 
-            default:
-                throw new InvalidCommandException();
+        default:
+            throw new InvalidCommandException();
         }
+    }
+
+    public static Task deleteTask(String input, ArrayList<Task> tasks) throws BuddyException {
+        String[] parts = input.trim().split("\\s+", 2);
+
+        if (parts.length < 2) {
+            throw new MissingArgumentException("Please provide a task number to delete.");
+        }
+
+        int idx;
+        try {
+            idx = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            throw new InvalidIndexException("That's not a valid number to delete: '" + parts[1] + "'");
+        }
+
+        if (idx <= 0 || idx > tasks.size()) {
+            throw new InvalidIndexException(
+                    "Invalid task number: " + idx + "\nPlease pick between 1 and " + tasks.size());
+        }
+
+        return tasks.remove(idx - 1);
     }
 
     public static void main(String[] args) {
@@ -201,11 +232,17 @@ public class Buddy {
                     printDivider();
                 }
 
-                // add task
+                // delete task
+                else if (input.trim().equalsIgnoreCase("delete") || input.trim().toLowerCase().startsWith("delete ")) {
+                    Task removedTask = deleteTask(input, tasks);
+                    printTaskDeletedSuccessMessage(removedTask, tasks.size());
+                }
+
+                // add a task
                 else {
                     Task newTask = addTask(input);
                     tasks.add(newTask);
-                    taskAddedSuccessMessage(newTask, tasks.size());
+                    printTaskAddedSuccessMessage(newTask, tasks.size());
                 }
             } catch (InvalidCommandException e) {
                 printHelp();
