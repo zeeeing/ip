@@ -1,17 +1,18 @@
 package buddy;
 
-import java.util.ArrayList;
-import java.util.Scanner;
-
 import buddy.exceptions.BuddyException;
 import buddy.exceptions.InvalidCommandException;
 import buddy.exceptions.InvalidFormatException;
 import buddy.exceptions.InvalidIndexException;
 import buddy.exceptions.MissingArgumentException;
+import buddy.storage.Storage;
 import buddy.tasks.Deadline;
 import buddy.tasks.Event;
 import buddy.tasks.Task;
 import buddy.tasks.Todo;
+
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Buddy {
     private static final String CHATBOT_NAME = "Buddy";
@@ -89,46 +90,48 @@ public class Buddy {
         String rest = tokens.length > 1 ? tokens[1].trim() : "";
 
         switch (command) {
-            case "todo":
-                if (rest.isEmpty()) {
-                    throw new MissingArgumentException("The description of a todo cannot be empty.");
-                }
-                return new Todo(rest);
+        case "todo":
+            if (rest.isEmpty()) {
+                throw new MissingArgumentException("The description of a todo cannot be empty.");
+            }
+            return new Todo(rest);
 
-            case "deadline":
-                if (rest.isEmpty()) {
-                    throw new InvalidFormatException("Invalid deadline format. Use: deadline <desc> /by <time>");
-                }
-                String[] parts = rest.split(" /by ", 2);
-                if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
-                    throw new InvalidFormatException("Invalid deadline format. Use: deadline <desc> /by <time>");
-                }
-                return new Deadline(parts[0].trim(), parts[1].trim());
+        case "deadline":
+            if (rest.isEmpty()) {
+                throw new InvalidFormatException("Invalid deadline format. Use: deadline <desc> /by <time>");
+            }
+            String[] parts = rest.split(" /by ", 2);
+            if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
+                throw new InvalidFormatException("Invalid deadline format. Use: deadline <desc> /by <time>");
+            }
+            return new Deadline(parts[0].trim(), parts[1].trim());
 
-            case "event":
-                if (rest.isEmpty()) {
-                    throw new InvalidFormatException("Invalid event format. Use: event <desc> /from <time> /to <time>");
-                }
-                String[] firstSplit = rest.split(" /from ", 2);
-                if (firstSplit.length < 2 || firstSplit[0].trim().isEmpty()) {
-                    throw new InvalidFormatException("Invalid event format. Use: event <desc> /from <time> /to <time>");
-                }
-                String[] timeParts = firstSplit[1].split(" /to ", 2);
-                if (timeParts.length < 2 || timeParts[0].trim().isEmpty() || timeParts[1].trim().isEmpty()) {
-                    throw new InvalidFormatException("Invalid event format. Use: event <desc> /from <time> /to <time>");
-                }
-                return new Event(firstSplit[0].trim(), timeParts[0].trim(), timeParts[1].trim());
+        case "event":
+            if (rest.isEmpty()) {
+                throw new InvalidFormatException("Invalid event format. Use: event <desc> /from <time> /to <time>");
+            }
+            String[] firstSplit = rest.split(" /from ", 2);
+            if (firstSplit.length < 2 || firstSplit[0].trim().isEmpty()) {
+                throw new InvalidFormatException("Invalid event format. Use: event <desc> /from <time> /to <time>");
+            }
+            String[] timeParts = firstSplit[1].split(" /to ", 2);
+            if (timeParts.length < 2 || timeParts[0].trim().isEmpty() || timeParts[1].trim().isEmpty()) {
+                throw new InvalidFormatException("Invalid event format. Use: event <desc> /from <time> /to <time>");
+            }
+            return new Event(firstSplit[0].trim(), timeParts[0].trim(), timeParts[1].trim());
 
-            default:
-                throw new InvalidCommandException();
+        default:
+            throw new InvalidCommandException();
         }
     }
 
     public static void main(String[] args) {
+        Storage storage = new Storage();
+        ArrayList<Task> tasks = new ArrayList<>(storage.load());
+
         welcomeMessage();
 
         Scanner scanner = new Scanner(System.in);
-        ArrayList<Task> tasks = new ArrayList<>();
 
         while (scanner.hasNextLine()) {
             String input = scanner.nextLine();
@@ -171,6 +174,8 @@ public class Buddy {
                     System.out.println("     Nice! I've marked this task as done:");
                     System.out.println("       " + t);
                     printDivider();
+
+                    storage.save(tasks);
                 }
 
                 // unmark task
@@ -199,6 +204,8 @@ public class Buddy {
                     System.out.println("     OK, I've marked this task as not done yet:");
                     System.out.println("       " + t);
                     printDivider();
+
+                    storage.save(tasks);
                 }
 
                 // add task
@@ -206,6 +213,7 @@ public class Buddy {
                     Task newTask = addTask(input);
                     tasks.add(newTask);
                     taskAddedSuccessMessage(newTask, tasks.size());
+                    storage.save(tasks);
                 }
             } catch (InvalidCommandException e) {
                 printHelp();
