@@ -38,4 +38,21 @@ public class TaskList {
     public List<Task> getTasks() {
         return tasks;
     }
+
+    public List<Task> find(String keyword) {
+        ArrayList<Task> results = new ArrayList<>();
+
+        // invalid keyword check
+        if (keyword == null || keyword.isEmpty()) {
+            return results;
+        }
+
+        String lower = keyword.toLowerCase();
+        for (Task task : tasks) {
+            if (task.getDescription().toLowerCase().contains(lower)) {
+                results.add(task);
+            }
+        }
+        return results;
+    }
 }
