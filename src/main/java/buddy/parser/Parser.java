@@ -1,5 +1,9 @@
 package buddy.parser;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 import buddy.commands.AddCommand;
 import buddy.commands.Command;
 import buddy.commands.DeleteCommand;
@@ -72,7 +76,16 @@ public class Parser {
                 throw new InvalidFormatException("Invalid deadline format. Use: deadline <desc> /by <time>");
             }
 
-            return new AddCommand(new Deadline(deadlineDesc, by));
+            Deadline deadlineTask;
+            try {
+                LocalDate date = LocalDate.parse(by, DateTimeFormatter.ISO_LOCAL_DATE);
+                deadlineTask = new Deadline(deadlineDesc, date);
+            } catch (DateTimeParseException e) {
+                // fallback to storing raw value
+                deadlineTask = new Deadline(deadlineDesc, by);
+            }
+
+            return new AddCommand(deadlineTask);
         case "event":
             if (arguments.isEmpty()) {
                 throw new InvalidFormatException("Invalid event format. Use: event <desc> /from <time> /to <time>");
@@ -91,7 +104,14 @@ public class Parser {
                 throw new InvalidFormatException("Invalid event format. Use: event <desc> /from <time> /to <time>");
             }
 
-            return new AddCommand(new Event(eventDesc, from, to));
+            try {
+                LocalDate fromDate = LocalDate.parse(from, DateTimeFormatter.ISO_LOCAL_DATE);
+                LocalDate toDate = LocalDate.parse(to, DateTimeFormatter.ISO_LOCAL_DATE);
+                return new AddCommand(new Event(eventDesc, fromDate, toDate));
+            } catch (DateTimeParseException e) {
+                // fallback to storing raw values
+                return new AddCommand(new Event(eventDesc, from, to));
+            }
         default:
             throw new InvalidCommandException();
         }

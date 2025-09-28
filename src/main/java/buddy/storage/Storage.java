@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -92,20 +94,37 @@ public class Storage {
                 System.out.println("     Skipping malformed stored deadline task: " + line);
                 return null;
             }
-            task = new Deadline(description, parts[3]);
+
+            String storedBy = parts[3];
+            try {
+                LocalDate byDate = LocalDate.parse(storedBy);
+                task = new Deadline(description, byDate);
+            } catch (DateTimeParseException e) {
+                task = new Deadline(description, storedBy);
+            }
             break;
         case "E":
             if (parts.length < 5) {
                 System.out.println("     Skipping malformed stored event task: " + line);
                 return null;
             }
-            task = new Event(description, parts[3], parts[4]);
+
+            String storedFrom = parts[3];
+            String storedTo = parts[4];
+            try {
+                LocalDate fromDate = LocalDate.parse(storedFrom);
+                LocalDate toDate = LocalDate.parse(storedTo);
+                task = new Event(description, fromDate, toDate);
+            } catch (DateTimeParseException e) {
+                task = new Event(description, storedFrom, storedTo);
+            }
             break;
         default:
             System.out.println("     Skipping unknown task type in storage: " + type);
             return null;
         }
 
+        // mark task if completed
         if ("1".equals(status)) {
             task.mark();
         }
@@ -122,13 +141,27 @@ public class Storage {
 
         if (task instanceof Deadline) {
             Deadline deadline = (Deadline) task;
-            return String.format("D | %s | %s | %s", status, task.getDescription(), deadline.getBy());
+            String by;
+            if (deadline.getByDate() != null) {
+                by = deadline.getByDate().toString();
+            } else {
+                by = deadline.getByRaw();
+            }
+            return String.format("D | %s | %s | %s", status, task.getDescription(), by);
         }
 
         if (task instanceof Event) {
             Event event = (Event) task;
-            return String.format("E | %s | %s | %s | %s", status, task.getDescription(), event.getFrom(),
-                                            event.getTo());
+            String from;
+            String to;
+            if (event.getFromDate() != null && event.getToDate() != null) {
+                from = event.getFromDate().toString();
+                to = event.getToDate().toString();
+            } else {
+                from = event.getFromRaw();
+                to = event.getToRaw();
+            }
+            return String.format("E | %s | %s | %s | %s", status, task.getDescription(), from, to);
         }
 
         return null;
