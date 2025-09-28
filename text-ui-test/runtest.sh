@@ -6,10 +6,12 @@ then
     mkdir ../bin
 fi
 
-# delete output from previous run
-if [ -e "./ACTUAL.TXT" ]
-then
+# delete output from previous run and reset data file
+if [ -e "./ACTUAL.TXT" ]; then
     rm ACTUAL.TXT
+fi
+if [ -e "./data/tasks.txt" ]; then
+    rm ./data/tasks.txt
 fi
 
 # compile the code into the bin folder, terminates if error occurred

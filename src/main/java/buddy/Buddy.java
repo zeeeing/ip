@@ -2,11 +2,11 @@ package buddy;
 
 import java.util.Scanner;
 
+import buddy.commands.Command;
 import buddy.exceptions.BuddyException;
 import buddy.exceptions.InvalidCommandException;
 import buddy.parser.Parser;
 import buddy.storage.Storage;
-import buddy.tasks.Task;
 import buddy.tasks.TaskList;
 import buddy.ui.Ui;
 
@@ -25,33 +25,10 @@ public class Buddy {
             String input = scanner.nextLine();
 
             try {
-                if (parser.isExit(input)) {
-                    ui.exitProgram();
+                Command command = parser.parse(input);
+                command.execute(tasks, ui, storage);
+                if (command.isExit()) {
                     break;
-                } else if (parser.isList(input)) {
-                    ui.listAllTasks(tasks);
-                } else if (parser.isMarkCommand(input)) {
-                    int idx = parser.parseTaskIndex(input, "mark", tasks.size());
-                    Task t = tasks.get(idx);
-                    t.mark();
-                    ui.printTaskMarkedSuccessMessage(t);
-                    storage.save(tasks.getTasks());
-                } else if (parser.isUnmarkCommand(input)) {
-                    int idx = parser.parseTaskIndex(input, "unmark", tasks.size());
-                    Task t = tasks.get(idx);
-                    t.unmark();
-                    ui.printTaskUnmarkedSuccessMessage(t);
-                    storage.save(tasks.getTasks());
-                } else if (parser.isDeleteCommand(input)) {
-                    int idx = parser.parseTaskIndex(input, "delete", tasks.size());
-                    Task removedTask = tasks.delete(idx);
-                    ui.printTaskDeletedSuccessMessage(removedTask, tasks.size());
-                    storage.save(tasks.getTasks());
-                } else {
-                    Task newTask = parser.parseAddTask(input);
-                    tasks.add(newTask);
-                    ui.printTaskAddedSuccessMessage(newTask, tasks.size());
-                    storage.save(tasks.getTasks());
                 }
             } catch (InvalidCommandException e) {
                 ui.printHelp();

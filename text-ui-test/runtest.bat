@@ -6,8 +6,18 @@ if not exist ..\bin mkdir ..\bin
 REM delete output from previous run
 if exist ACTUAL.TXT del ACTUAL.TXT
 
-REM compile the code into the bin folder
-javac  -cp ..\src\main\java -Xlint:none -d ..\bin ..\src\main\java\*.java
+REM reset data file
+if exist data\tasks.txt del data\tasks.txt
+
+REM compile all sources into the bin folder
+javac -cp ..\src\main\java -Xlint:none -d ..\bin ^
+  ..\src\main\java\buddy\Buddy.java ^
+  ..\src\main\java\buddy\commands\*.java ^
+  ..\src\main\java\buddy\exceptions\*.java ^
+  ..\src\main\java\buddy\parser\*.java ^
+  ..\src\main\java\buddy\storage\*.java ^
+  ..\src\main\java\buddy\tasks\*.java ^
+  ..\src\main\java\buddy\ui\*.java ^
 IF ERRORLEVEL 1 (
     echo ********** BUILD FAILURE **********
     exit /b 1

@@ -1,5 +1,12 @@
 package buddy.parser;
 
+import buddy.commands.AddCommand;
+import buddy.commands.Command;
+import buddy.commands.DeleteCommand;
+import buddy.commands.ExitCommand;
+import buddy.commands.ListCommand;
+import buddy.commands.MarkCommand;
+import buddy.commands.UnmarkCommand;
 import buddy.exceptions.BuddyException;
 import buddy.exceptions.InvalidCommandException;
 import buddy.exceptions.InvalidFormatException;
@@ -7,105 +14,94 @@ import buddy.exceptions.InvalidIndexException;
 import buddy.exceptions.MissingArgumentException;
 import buddy.tasks.Deadline;
 import buddy.tasks.Event;
-import buddy.tasks.Task;
 import buddy.tasks.Todo;
 
 public class Parser {
-    public boolean isExit(String input) {
-        return input != null && input.trim().equalsIgnoreCase("bye");
-    }
-
-    public boolean isList(String input) {
-        return input != null && input.trim().equalsIgnoreCase("list");
-    }
-
-    public boolean isMarkCommand(String input) {
-        if (input == null) {
-            return false;
-        }
-        String trimmed = input.trim().toLowerCase();
-        return trimmed.equals("mark") || trimmed.startsWith("mark ");
-    }
-
-    public boolean isUnmarkCommand(String input) {
-        if (input == null) {
-            return false;
-        }
-        String trimmed = input.trim().toLowerCase();
-        return trimmed.equals("unmark") || trimmed.startsWith("unmark ");
-    }
-
-    public boolean isDeleteCommand(String input) {
-        if (input == null) {
-            return false;
-        }
-        String trimmed = input.trim().toLowerCase();
-        return trimmed.equals("delete") || trimmed.startsWith("delete ");
-    }
-
-    public int parseTaskIndex(String input, String action, int max) throws BuddyException {
-        String[] parts = input.trim().split("\\s+", 2);
-        if (parts.length < 2) {
-            throw new MissingArgumentException("Please provide a task number to " + action + ".");
-        }
-
-        int taskIdx;
-        try {
-            taskIdx = Integer.parseInt(parts[1]);
-        } catch (NumberFormatException e) {
-            throw new InvalidIndexException("That's not a valid number to " + action + ": '" + parts[1] + "'");
-        }
-
-        if (taskIdx <= 0 || taskIdx > max) {
-            throw new InvalidIndexException("Invalid task number: " + taskIdx + "\nPlease pick between 1 and " + max);
-        }
-
-        // convert to 0-based for internal usage
-        return taskIdx - 1;
-    }
-
-    public Task parseAddTask(String input) throws BuddyException {
-        String trimmed = input.trim();
+    public Command parse(String input) throws BuddyException {
+        // empty input check
+        String trimmed = input == null ? "" : input.trim();
         if (trimmed.isEmpty()) {
             throw new InvalidCommandException();
         }
 
+        // split command and arguments
         String[] tokens = trimmed.split("\\s+", 2);
         String command = tokens[0].toLowerCase();
-        String rest = tokens.length > 1 ? tokens[1].trim() : "";
+        String arguments = tokens.length > 1 ? tokens[1].trim() : "";
 
         switch (command) {
+        case "bye":
+            if (!arguments.isEmpty()) {
+                throw new InvalidCommandException();
+            }
+            return new ExitCommand();
+        case "list":
+            if (!arguments.isEmpty()) {
+                throw new InvalidCommandException();
+            }
+            return new ListCommand();
+        case "mark":
+            if (arguments.isEmpty()) {
+                throw new MissingArgumentException("Please provide a task number to mark.");
+            }
+            return new MarkCommand(parseIndex0Based(arguments));
+        case "unmark":
+            if (arguments.isEmpty()) {
+                throw new MissingArgumentException("Please provide a task number to unmark.");
+            }
+            return new UnmarkCommand(parseIndex0Based(arguments));
+        case "delete":
+            if (arguments.isEmpty()) {
+                throw new MissingArgumentException("Please provide a task number to delete.");
+            }
+            return new DeleteCommand(parseIndex0Based(arguments));
         case "todo":
-            if (rest.isEmpty()) {
+            if (arguments.isEmpty()) {
                 throw new MissingArgumentException("The description of a todo cannot be empty.");
             }
-            return new Todo(rest);
-
+            return new AddCommand(new Todo(arguments));
         case "deadline":
-            if (rest.isEmpty()) {
+            if (arguments.isEmpty()) {
                 throw new InvalidFormatException("Invalid deadline format. Use: deadline <desc> /by <time>");
             }
-            String[] parts = rest.split(" /by ", 2);
-            if (parts.length < 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
-                throw new InvalidFormatException("Invalid deadline format. Use: deadline <desc> /by <time>");
-            }
-            return new Deadline(parts[0].trim(), parts[1].trim());
 
+            String[] parts = arguments.split(" /by ", 2);
+            String deadlineDesc = parts[0].trim();
+            String by = parts.length > 1 ? parts[1].trim() : "";
+            if (parts.length < 2 || deadlineDesc.isEmpty() || by.isEmpty()) {
+                throw new InvalidFormatException("Invalid deadline format. Use: deadline <desc> /by <time>");
+            }
+
+            return new AddCommand(new Deadline(deadlineDesc, by));
         case "event":
-            if (rest.isEmpty()) {
+            if (arguments.isEmpty()) {
                 throw new InvalidFormatException("Invalid event format. Use: event <desc> /from <time> /to <time>");
             }
-            String[] firstSplit = rest.split(" /from ", 2);
-            if (firstSplit.length < 2 || firstSplit[0].trim().isEmpty()) {
+
+            String[] firstSplit = arguments.split(" /from ", 2);
+            String eventDesc = firstSplit[0].trim();
+            if (firstSplit.length < 2 || eventDesc.isEmpty()) {
                 throw new InvalidFormatException("Invalid event format. Use: event <desc> /from <time> /to <time>");
             }
+
             String[] timeParts = firstSplit[1].split(" /to ", 2);
-            if (timeParts.length < 2 || timeParts[0].trim().isEmpty() || timeParts[1].trim().isEmpty()) {
+            String from = timeParts[0].trim();
+            String to = timeParts.length > 1 ? timeParts[1].trim() : "";
+            if (timeParts.length < 2 || from.isEmpty() || to.isEmpty()) {
                 throw new InvalidFormatException("Invalid event format. Use: event <desc> /from <time> /to <time>");
             }
-            return new Event(firstSplit[0].trim(), timeParts[0].trim(), timeParts[1].trim());
+
+            return new AddCommand(new Event(eventDesc, from, to));
         default:
             throw new InvalidCommandException();
+        }
+    }
+
+    private int parseIndex0Based(String s) throws InvalidIndexException {
+        try {
+            return Integer.parseInt(s) - 1;
+        } catch (NumberFormatException e) {
+            throw new InvalidIndexException("That's not a valid number: '" + s + "'");
         }
     }
 }
