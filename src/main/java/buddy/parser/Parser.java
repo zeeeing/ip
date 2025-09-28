@@ -9,6 +9,7 @@ import buddy.commands.Command;
 import buddy.commands.DeleteCommand;
 import buddy.commands.ExitCommand;
 import buddy.commands.ListCommand;
+import buddy.commands.FindCommand;
 import buddy.commands.MarkCommand;
 import buddy.commands.UnmarkCommand;
 import buddy.exceptions.BuddyException;
@@ -59,6 +60,11 @@ public class Parser {
                 throw new MissingArgumentException("Please provide a task number to delete.");
             }
             return new DeleteCommand(parseIndex0Based(arguments));
+        case "find":
+            if (arguments.isEmpty()) {
+                throw new MissingArgumentException("Please provide a keyword to search for.");
+            }
+            return new FindCommand(arguments);
         case "todo":
             if (arguments.isEmpty()) {
                 throw new MissingArgumentException("The description of a todo cannot be empty.");

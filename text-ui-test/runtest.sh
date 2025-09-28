@@ -15,7 +15,14 @@ if [ -e "./data/tasks.txt" ]; then
 fi
 
 # compile the code into the bin folder, terminates if error occurred
-if ! javac -cp ../src/main/java -Xlint:none -d ../bin ../src/main/java/buddy/Buddy.java ../src/main/java/buddy/tasks/*.java ../src/main/java/buddy/exceptions/*.java
+if ! javac -cp ../src/main/java -Xlint:none -d ../bin \
+  ../src/main/java/buddy/Buddy.java \
+  ../src/main/java/buddy/commands/*.java \
+  ../src/main/java/buddy/exceptions/*.java \
+  ../src/main/java/buddy/parser/*.java \
+  ../src/main/java/buddy/storage/*.java \
+  ../src/main/java/buddy/tasks/*.java \
+  ../src/main/java/buddy/ui/*.java
 then
     echo "********** BUILD FAILURE **********"
     exit 1

@@ -51,6 +51,21 @@ public class Ui {
         printDivider();
     }
 
+    public void listMatchingTasks(List<Task> matches) {
+        printDivider();
+        if (matches == null || matches.isEmpty()) {
+            System.out.println("     No matching tasks found.");
+        } else {
+            System.out.println("     Here are the matching tasks in your list:");
+            int taskIdx = 1;
+            for (Task task : matches) {
+                System.out.println("     " + taskIdx + "." + task);
+                taskIdx++;
+            }
+        }
+        printDivider();
+    }
+
     public void printHelp() {
         printDivider();
         System.out.println("     I'm sorry, but I don't know what that means :-(\n");
@@ -61,6 +76,7 @@ public class Ui {
         System.out.println("     4. deadline <desc> /by <time>");
         System.out.println("     5. event <desc> /from <time> /to <time>");
         System.out.println("     6. delete <task_number>");
+        System.out.println("     7. find <keyword>");
         printDivider();
     }
 
