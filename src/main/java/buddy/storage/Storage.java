@@ -14,8 +14,11 @@ import buddy.tasks.Task;
 import buddy.tasks.Todo;
 
 public class Storage {
-    private static final String DATA_DIRECTORY = "data";
-    private static final String FILE_NAME = "tasks.txt";
+    private final String filePath;
+
+    public Storage(String filePath) {
+        this.filePath = filePath;
+    }
 
     public List<Task> load() {
         File file = ensureFileReady();
@@ -23,7 +26,7 @@ public class Storage {
         List<Task> tasks = new ArrayList<>();
         try (Scanner scanner = new Scanner(file)) {
             while (scanner.hasNextLine()) {
-                Task task = parseTask(scanner.nextLine());
+                Task task = readTaskFromStorage(scanner.nextLine());
                 if (task != null) {
                     tasks.add(task);
                 }
@@ -52,12 +55,7 @@ public class Storage {
     }
 
     private File ensureFileReady() {
-        File directory = new File(DATA_DIRECTORY);
-        if (!directory.exists() && !directory.mkdirs()) {
-            System.out.println("     Unable to create data directory.");
-        }
-
-        File file = new File(directory, FILE_NAME);
+        File file = new File(filePath);
         try {
             if (!file.exists() && !file.createNewFile()) {
                 System.out.println("     Unable to create data file.");
@@ -69,7 +67,7 @@ public class Storage {
         return file;
     }
 
-    private Task parseTask(String line) {
+    private Task readTaskFromStorage(String line) {
         if (line == null || line.trim().isEmpty()) {
             return null;
         }

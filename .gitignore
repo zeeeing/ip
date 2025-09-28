@@ -21,7 +21,7 @@ text-ui-test/EXPECTED-UNIX.TXT
 *.class
 
 # Data files
-/data
+data/
 
 # Configuration files
 .vscode
