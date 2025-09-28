@@ -1,26 +1,59 @@
 package buddy.tasks;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 public class Event extends Task {
 
-    protected String from;
-    protected String to;
+    private final LocalDate fromDate;
+    private final LocalDate toDate;
+    private final String fromRaw;
+    private final String toRaw;
 
-    public Event(String description, String from, String to) {
+    public Event(String description, String fromRaw, String toRaw) {
         super(description);
-        this.from = from;
-        this.to = to;
+        this.fromDate = null;
+        this.toDate = null;
+        this.fromRaw = fromRaw;
+        this.toRaw = toRaw;
     }
 
-    public String getFrom() {
-        return from;
+    public Event(String description, LocalDate fromDate, LocalDate toDate) {
+        super(description);
+        this.fromDate = fromDate;
+        this.toDate = toDate;
+        this.fromRaw = null;
+        this.toRaw = null;
     }
 
-    public String getTo() {
-        return to;
+    public LocalDate getFromDate() {
+        return fromDate;
+    }
+
+    public LocalDate getToDate() {
+        return toDate;
+    }
+
+    public String getFromRaw() {
+        return fromRaw;
+    }
+
+    public String getToRaw() {
+        return toRaw;
+    }
+
+    private String formatDisplay(LocalDate date, String raw) {
+        if (date != null) {
+            DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MMM dd yyyy");
+            return date.format(dateFormat);
+        }
+        return raw;
     }
 
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (from: " + from + " to: " + to + ")";
+        String fromDisplay = formatDisplay(fromDate, fromRaw);
+        String toDisplay = formatDisplay(toDate, toRaw);
+        return "[E]" + super.toString() + " (from: " + fromDisplay + " to: " + toDisplay + ")";
     }
 }
