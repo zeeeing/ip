@@ -13,7 +13,16 @@ src/main/resources/docs/
 *.iml
 bin/
 
+# Test output
 /text-ui-test/ACTUAL.TXT
 text-ui-test/EXPECTED-UNIX.TXT
+
+# Compiled class files
 *.class
+
+# Data files
 /data
+
+# Configuration files
+.vscode
+eclipse-java-formatter.xml

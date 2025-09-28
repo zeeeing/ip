@@ -1,10 +1,5 @@
 package buddy.storage;
 
-import buddy.tasks.Deadline;
-import buddy.tasks.Event;
-import buddy.tasks.Task;
-import buddy.tasks.Todo;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -12,6 +7,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import buddy.tasks.Deadline;
+import buddy.tasks.Event;
+import buddy.tasks.Task;
+import buddy.tasks.Todo;
 
 public class Storage {
     private static final String DATA_DIRECTORY = "data";
@@ -130,7 +130,7 @@ public class Storage {
         if (task instanceof Event) {
             Event event = (Event) task;
             return String.format("E | %s | %s | %s | %s", status, task.getDescription(), event.getFrom(),
-                    event.getTo());
+                                            event.getTo());
         }
 
         return null;

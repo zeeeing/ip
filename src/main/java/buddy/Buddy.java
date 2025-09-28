@@ -1,5 +1,8 @@
 package buddy;
 
+import java.util.ArrayList;
+import java.util.Scanner;
+
 import buddy.exceptions.BuddyException;
 import buddy.exceptions.InvalidCommandException;
 import buddy.exceptions.InvalidFormatException;
@@ -11,19 +14,16 @@ import buddy.tasks.Event;
 import buddy.tasks.Task;
 import buddy.tasks.Todo;
 
-import java.util.ArrayList;
-import java.util.Scanner;
-
 public class Buddy {
     private static final String CHATBOT_NAME = "Buddy";
     private static final String BUDDY_LOGO = """
-                 ______     _    _    _____     _____    __   __
-                |  ___ \\   | |  | |  |  __ \\   |  __ \\   \\ \\ / /
-                | |___) |  | |  | |  | |  \\ \\  | |  \\ \\   \\ V /
-                |  ___ \\   | |  | |  | |   | | | |   | |   | |
-                | |___) |  | |__| |  | |__/ /  | |__/ /    | |
-                |______/    \\____/   |_____/   |_____/     |_|
-            """;
+                                         ______     _    _    _____     _____    __   __
+                                        |  ___ \\   | |  | |  |  __ \\   |  __ \\   \\ \\ / /
+                                        | |___) |  | |  | |  | |  \\ \\  | |  \\ \\   \\ V /
+                                        |  ___ \\   | |  | |  | |   | | | |   | |   | |
+                                        | |___) |  | |__| |  | |__/ /  | |__/ /    | |
+                                        |______/    \\____/   |_____/   |_____/     |_|
+                                    """;
 
     public static void printDivider() {
         System.out.println("    ____________________________________________________________");
@@ -148,8 +148,8 @@ public class Buddy {
         }
 
         if (idx <= 0 || idx > tasks.size()) {
-            throw new InvalidIndexException(
-                    "Invalid task number: " + idx + "\nPlease pick between 1 and " + tasks.size());
+            throw new InvalidIndexException("Invalid task number: " + idx + "\nPlease pick between 1 and "
+                                            + tasks.size());
         }
 
         return tasks.remove(idx - 1);
@@ -193,8 +193,8 @@ public class Buddy {
                     }
 
                     if (idx <= 0 || idx > tasks.size()) {
-                        throw new InvalidIndexException(
-                                "Invalid task number: " + idx + "\nPlease pick between 1 and " + tasks.size());
+                        throw new InvalidIndexException("Invalid task number: " + idx + "\nPlease pick between 1 and "
+                                                        + tasks.size());
                     }
 
                     Task t = tasks.get(idx - 1);
@@ -223,8 +223,8 @@ public class Buddy {
                     }
 
                     if (idx <= 0 || idx > tasks.size()) {
-                        throw new InvalidIndexException(
-                                "Invalid task number: " + idx + "\nPlease pick between 1 and " + tasks.size());
+                        throw new InvalidIndexException("Invalid task number: " + idx + "\nPlease pick between 1 and "
+                                                        + tasks.size());
                     }
 
                     Task t = tasks.get(idx - 1);
@@ -242,7 +242,7 @@ public class Buddy {
                 else if (input.trim().equalsIgnoreCase("delete") || input.trim().toLowerCase().startsWith("delete ")) {
                     Task removedTask = deleteTask(input, tasks);
                     printTaskDeletedSuccessMessage(removedTask, tasks.size());
-                    
+
                     storage.save(tasks);
                 }
 
@@ -252,7 +252,7 @@ public class Buddy {
                     tasks.add(newTask);
 
                     printTaskAddedSuccessMessage(newTask, tasks.size());
-                  
+
                     storage.save(tasks);
                 }
             } catch (InvalidCommandException e) {
