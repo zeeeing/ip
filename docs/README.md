@@ -7,7 +7,7 @@ Buddy is a lightweight command-line companion that helps you track todos, deadli
 1. Ensure you have Java 17 or above installed.
 2. Download the latest `.jar` file from [here](https://github.com/zeeeing/ip/releases/latest).
 3. Copy the file to the folder you want to use as the home folder for your Buddy.
-4. Open a command terminal, `cd` into the folder you put the jar file in, and use the `java -jar Buddy.jar` command to run the application.
+4. Open a command terminal, `cd` into the folder you put the jar file in, and use the `java -jar buddy_v0.2.jar` command to run the application.
 5. Type commands into the prompt that appears. Buddy creates its data file automatically if it is missing.
 6. Enter `bye` at any time to save your list and quit.
 
