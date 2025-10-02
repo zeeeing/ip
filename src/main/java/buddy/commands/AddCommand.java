@@ -5,6 +5,9 @@ import buddy.tasks.Task;
 import buddy.tasks.TaskList;
 import buddy.ui.Ui;
 
+/**
+ * Adds a new task to the task list and persists the updated list.
+ */
 public class AddCommand extends Command {
     private final Task task;
 
@@ -12,6 +15,9 @@ public class AddCommand extends Command {
         this.task = task;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         tasks.add(task);
@@ -19,6 +25,9 @@ public class AddCommand extends Command {
         storage.save(tasks.getTasks());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isExit() {
         return false;

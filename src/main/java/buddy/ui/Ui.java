@@ -51,6 +51,13 @@ public class Ui {
         printDivider();
     }
 
+    /**
+     * Displays the list of tasks that matches the search query executed via the
+     * find command. If no tasks match, an appropriate message is shown.
+     * 
+     * @param matches - The {@link List} of {@link Task}s that match the search
+     * keyword. If no tasks match, this {@link List} is empty.
+     */
     public void listMatchingTasks(List<Task> matches) {
         printDivider();
         if (matches == null || matches.isEmpty()) {
