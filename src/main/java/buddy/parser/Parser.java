@@ -8,8 +8,8 @@ import buddy.commands.AddCommand;
 import buddy.commands.Command;
 import buddy.commands.DeleteCommand;
 import buddy.commands.ExitCommand;
-import buddy.commands.ListCommand;
 import buddy.commands.FindCommand;
+import buddy.commands.ListCommand;
 import buddy.commands.MarkCommand;
 import buddy.commands.UnmarkCommand;
 import buddy.exceptions.BuddyException;
@@ -22,6 +22,23 @@ import buddy.tasks.Event;
 import buddy.tasks.Todo;
 
 public class Parser {
+    /**
+     * Parses a single line of user input into a {@link Command} instance. Input
+     * is expected to be a command keyword followed by zero or more arguments,
+     * separated by whitespace. Structured commands may have additional syntax
+     * requirements.
+     *
+     * @param input - Raw user input line, containing a command keyword and
+     * arguments, if any.
+     * @return The concrete {@link Command} representing the requested action.
+     * @throws InvalidCommandException If the command keyword is missing/unknown
+     * or extra arguments are provided.
+     * @throws MissingArgumentException If a required argument is missing.
+     * @throws InvalidFormatException If a structured command has an invalid
+     * format.
+     * @throws InvalidIndexException If an index cannot be parsed as a positive
+     * integer.
+     */
     public Command parse(String input) throws BuddyException {
         // empty input check
         String trimmed = input == null ? "" : input.trim();

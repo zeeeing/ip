@@ -22,6 +22,12 @@ public class Storage {
         this.filePath = filePath;
     }
 
+    /**
+     * Loads tasks from the storage file.
+     * 
+     * @return A list of tasks loaded from the file. If the file does not exist
+     * or is empty, an empty list is returned.
+     */
     public List<Task> load() {
         File file = ensureFileReady();
 
@@ -40,6 +46,12 @@ public class Storage {
         return tasks;
     }
 
+    /**
+     * Saves the given list of tasks to the storage file, overwriting any
+     * existing content.
+     * 
+     * @param tasks - The {@link List} of tasks to save.
+     */
     public void save(List<Task> tasks) {
         File file = ensureFileReady();
 
@@ -56,6 +68,12 @@ public class Storage {
         }
     }
 
+    /**
+     * Ensures that the storage file exists. If the file does not exist, it
+     * attempts to create it.
+     * 
+     * @return - The {@link File} object representing the storage file.
+     */
     private File ensureFileReady() {
         File file = new File(filePath);
         try {
@@ -69,6 +87,15 @@ public class Storage {
         return file;
     }
 
+    /**
+     * Reads a single task from a line in the storage file. Malformed lines are
+     * skipped with a warning.
+     * 
+     * @param line - A {@link String} representing a single line from the
+     * storage file. This line should represent a {@link Task} in stored format.
+     * @return The Task object parsed from the line, or null if the line is
+     * malformed.
+     */
     private Task readTaskFromStorage(String line) {
         if (line == null || line.trim().isEmpty()) {
             return null;
@@ -132,6 +159,13 @@ public class Storage {
         return task;
     }
 
+    /**
+     * Formats a task into a string suitable to be written into the storage
+     * file.
+     * 
+     * @param task - The {@link Task} to format.
+     * @return A formatted string representation of the task for storage.
+     */
     private String formatTask(Task task) {
         String status = task.isCompleted() ? "1" : "0";
 

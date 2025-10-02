@@ -6,6 +6,9 @@ import buddy.tasks.Task;
 import buddy.tasks.TaskList;
 import buddy.ui.Ui;
 
+/**
+ * Deletes a task at the specified index and updates persistent storage.
+ */
 public class DeleteCommand extends Command {
     private final int index; // 0-based index
 
@@ -13,6 +16,9 @@ public class DeleteCommand extends Command {
         this.index = index;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws InvalidIndexException {
         if (index < 0 || index >= tasks.size()) {
@@ -23,6 +29,9 @@ public class DeleteCommand extends Command {
         storage.save(tasks.getTasks());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isExit() {
         return false;
